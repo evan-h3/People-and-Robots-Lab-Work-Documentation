@@ -1,9 +1,14 @@
 import cv2  # Import OpenCv library
+from fer import FER  # OpenCV Facial Expression Recognition pre trained model
+
 
 # Load the Haar Cascade pre-trained model from OpenCV for face detection
 face_cascade = cv2.CascadeClassifier(
     cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
 )
+
+# Initialize emotion detector
+emotion_detector = FER()
 
 # Open a connection to the webcam (0 = default webcam)
 cap = cv2.VideoCapture(0)
@@ -26,10 +31,38 @@ while True:
     # Loops through the lists of face coordinates, and draws a rectangle around the face
     # Arguments: (the frame, top left corner, bottom right corner, color (BGR format), thickness of line)
     for x, y, w, h in faces:
+        # Crop face from the frame
+        face_frame = frame[y : y + h, x : x + w]
+
+        # Detect emotion using the FER model
+        emotion, score = emotion_detector.top_emotion(face_frame)
+
         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
+        # Check if score is None before formatting it
+        if score is not None:
+            cv2.putText(
+                frame,
+                f"{emotion}: {score:.2f}",
+                (x, y - 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.9,
+                (255, 255, 255),
+                2,
+            )
+        else:
+            cv2.putText(
+                frame,
+                f"{emotion}",
+                (x, y - 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.9,
+                (255, 255, 255),
+                2,
+            )
+
     # Display the resulting frame
-    cv2.imshow("Face Detection Proptotype Program #1", frame)
+    cv2.imshow("Face & Mood Detection Proptotype Program #2", frame)
 
     # Waits 1ms between frames to see if user presses 'q' on keyboard
     if cv2.waitKey(1) == ord("q"):
