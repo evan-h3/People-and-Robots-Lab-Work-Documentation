@@ -1,5 +1,5 @@
 # Documentation of my work in the People and Robots Lab
 
-Projects:
+Projects (so far):
 - Facial Recognition Project (Detection/Mood)
 
